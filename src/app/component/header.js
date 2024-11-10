@@ -14,29 +14,21 @@ import { FaBarsStaggered } from "react-icons/fa6";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useState, useEffect } from "react";
 
-export default function Header({ cartupdateNum = 0 }) {
+export default function Header() {
   const [cartNum, setCartNum] = useState(0);
 
   useEffect(() => {
-    const storedCartNum = localStorage.getItem('cartNum');
-    if (storedCartNum) {
-      setCartNum(Number(storedCartNum));
-    }
+    const calculateTotalQuantity = () => {
+      const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+      const totalQuantity = storedCart.reduce((total, item) => total + item.quantity, 0);
+      setCartNum(totalQuantity);
+    };
+    calculateTotalQuantity();
+    window.addEventListener("storage", calculateTotalQuantity);
+    return () => window.removeEventListener("storage", calculateTotalQuantity);
   }, []);
 
-  useEffect(() => {
-    if (cartNum > 0) {
-      localStorage.setItem('cartNum', cartNum);
-    }
-  }, [cartNum]);
-
-  useEffect(() => {
-
-    if (typeof cartupdateNum === 'number' && cartupdateNum > 0) {
-      setCartNum((prevCartNum) => prevCartNum + cartupdateNum);
-    }
-  }, [cartupdateNum]);
-
+ 
 
   
   return (

@@ -22,8 +22,6 @@ export default function SingalProductPage() {
   const [clicked, setClicked] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
-  const [updatecartNum , setUpdatecartNum] = useState();
-
   const pathname = usePathname();
   const singalproduct = pathname.replace("/shop/", "");
 
@@ -33,7 +31,6 @@ export default function SingalProductPage() {
         const response = await fetch(
           `https://fakestoreapi.com/products/${singalproduct}`
         );
-        // if (!response.ok) throw new Error("Product not found");
         const data = await response.json();
         setProduct(data);
       } catch (err) {
@@ -56,7 +53,23 @@ export default function SingalProductPage() {
 
   const handleClick = () => { 
     setClicked(true);
-    setUpdatecartNum(quantity);
+    const cartItem = {
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.image,
+      quantity,
+    };
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existingItemIndex = existingCart.findIndex(item => item.id === product.id);
+
+    if (existingItemIndex > -1) {
+      existingCart[existingItemIndex].quantity += quantity;
+    } else {
+      existingCart.push(cartItem);
+    }
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+    window.dispatchEvent(new Event("storage"));
     setTimeout(() => {
       setClicked(false);
       setQuantity(1)
@@ -66,7 +79,7 @@ export default function SingalProductPage() {
 
   return (
     <>
-      <Header cartupdateNum={updatecartNum} />
+      <Header />
       {loading ? (
         <section className="  flex py-20  justify-center items-center">
           <Card className="w-[900px] h-[350px] space-y-5 p-4" radius="lg" >
