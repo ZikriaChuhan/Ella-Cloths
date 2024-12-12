@@ -159,14 +159,13 @@
   font-size: 12px;
 }
 .soping-card span {
+  width: 20px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  width: 22px;
-  text-align: center;
-  height: 22px;
-  font-size: 11px;
-  padding: 5px;
+  align-items: center;
+  height: 20px;
+  font-size: 12px;
+  padding: 5px 10px;
   background-color: lightpink;
   border-radius: 50%;
 }

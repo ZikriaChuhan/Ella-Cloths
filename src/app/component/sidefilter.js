@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Slider } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/react";
+import {Listbox, ListboxItem} from "@nextui-org/react";
 
 
 
-export default function SideFilter({ onSortChange, onPriceChange }) {
+export default function SideFilter({ onSortChange, onPriceChange, onTabChange}) {
+  const [selectedKey, setSelectedKey] = useState("");
   const [sortvalue, setSortValue] = useState("");
   const [minPrice, setMinPrice] = useState([0, 1000]);
+
 
   const sortBy = (e) => {
     const newSortValue = e.target.value;
@@ -21,6 +24,16 @@ export default function SideFilter({ onSortChange, onPriceChange }) {
     onPriceChange(value);
   };
 
+  const handleTabChange = (keys) => {
+    const newTabValue = keys.size > 0 ? keys.values().next().value : ""
+    setSelectedKey(newTabValue);
+    onTabChange(newTabValue);
+
+  };
+
+  
+
+ 
   return (
     <>
       <section className="side-filter-section  w-max px-10 py-8">
@@ -40,68 +53,23 @@ export default function SideFilter({ onSortChange, onPriceChange }) {
           </div>
           <div className="categories-filter flex flex-col gap-4">
             <h2>Categories</h2>
-            <ul>
-              <li className=" cursor-pointer">
-                <input
-                  type="checkbox"
-                  className=" hidden"
-                  id="men"
-                  name="men"
-                  value="men"
-                />
-                <label htmlFor="men">Men</label>
-              </li>
-              <li>
-                <input
-                  type="checkbox"
-                  className=" hidden"
-                  id="women"
-                  name="women"
-                  value="women"
-                />
-                <label htmlFor="women">Women</label>
-              </li>
-              <li>
-                <input
-                  type="checkbox"
-                  className=" hidden"
-                  id="newarrival"
-                  name="newarrival"
-                  value="newarrival"
-                />
-                <label htmlFor="women">New Arrival</label>
-              </li>
-              <li>
-                <input
-                  type="checkbox"
-                  className=" hidden"
-                  id="trend"
-                  name="trend"
-                  value="trend"
-                />
-                <label htmlFor="women">Trend</label>
-              </li>
-              <li>
-                <input
-                  type="checkbox"
-                  className=" hidden"
-                  id="kids"
-                  name="kids"
-                  value="kids"
-                />
-                <label htmlFor="kids">Kids</label>
-              </li>
-              <li>
-                <input
-                  type="checkbox"
-                  className=" hidden"
-                  id="accessories"
-                  name="accessories"
-                  value="accessories"
-                />
-                <label htmlFor="accessories">Accessories</label>
-              </li>
-            </ul>
+            <div className="flex flex-col gap-2">
+      <Listbox
+        aria-label="Single selection example"
+        variant="flat"
+        disallowEmptySelection
+        selectionMode="single"
+        selectedKeys={new Set([selectedKey])}
+        onSelectionChange={handleTabChange}
+      >
+        <ListboxItem key="men's clothing">Men&apos;s Clothing</ListboxItem>
+        <ListboxItem key="women's clothing">Women&apos;s clothing</ListboxItem>
+        <ListboxItem key="jewelery">Jewelery</ListboxItem>
+        <ListboxItem key="electronics">Electronics</ListboxItem>
+      </Listbox>
+      
+    </div>
+
           </div>
           <div className="price-filter">
             <h2>Price</h2>
@@ -115,9 +83,9 @@ export default function SideFilter({ onSortChange, onPriceChange }) {
               defaultValue={[0, 1000]}
               formatOptions={{ style: "currency", currency: "USD" }}
               classNames={{
-                track: "border-1 border-slate-300",
-                thumb: "h-6 w-7 border-2 bg-slate-500",
-                filler: "bg-slate-800",
+                track: "border-0  border-slate-300",
+                thumb: "h-6 w-7 border-0 bg-slate-100",
+                filler: "bg-slate-800 h-2",
               }}
             />
           </div>

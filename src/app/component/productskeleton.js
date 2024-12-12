@@ -29,7 +29,7 @@ export default function ProductSkeleton() {
   return (
     <>
      
-       <div className="grid grid-cols-4 gap-4 py-20 w-max">
+       <div className="grid grid-cols-4 gap-4  py-20 w-max">
       {cards}
     </div>
 

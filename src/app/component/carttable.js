@@ -1,89 +1,140 @@
-"use client"
-import { useState, useEffect } from "react";
-import { Button, Input } from "@nextui-org/react";
-import { FaTrashCan } from "react-icons/fa6";
+"use client";
 
+import React from "react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  User,
+  Chip,
+  Tooltip,
+} from "@nextui-org/react";
+import { DeleteIcon } from "../cart/component/DeleteIcon";
+import { useSelector, useDispatch } from "react-redux";
+import { updateQuantity, removeFromCart } from "@/app/store/cartSlice";
 
 export default function CartTable() {
+  const items = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
 
-  const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
-  }, []);
-
-  const updateCartStorage = (updatedCart) => {
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event("storage"));
+  const handleRemoveFromCart = (itemId) => {
+    dispatch(removeFromCart(itemId));
   };
 
-  const updateQuantity = (id, quantity) => {
-    const updatedCart = cart.map(item =>
-      item.id === id ? { ...item, quantity: quantity > 0 ? quantity : 1 } : item
-    );
-    setCart(updatedCart);
-    updateCartStorage(updatedCart);
-  };
 
-  const removeFromCart = (id) => {
-    const updatedCart = cart.filter(item => item.id !== id);
-    setCart(updatedCart);
-    updateCartStorage(updatedCart);
-  };
-
+    // Increase quantity function
+    const plusQuantity = (itemId) => {
+      const item = items.find((item) => item.id === itemId);
+      const updatedQuantity = item.quantity + 1;
+      dispatch(updateQuantity({ id: itemId, quantity: updatedQuantity }));
+    };
+  
+    // Decrease quantity function
+    const minusQuantity = (itemId) => {
+      const item = items.find((item) => item.id === itemId);
+      if (item.quantity > 1) {
+        const updatedQuantity = item.quantity - 1;
+        dispatch(updateQuantity({ id: itemId, quantity: updatedQuantity }));
+      }
+    };
 
 
 
   return (
     <>
-    <section className=" py-24 flex flex-col gap-10 items-center">
-      <h2 className="shop-bag-h2">Shopping Bag </h2>
+      <Table aria-label="Example table with custom cells">
+        <TableHeader>
+          <TableColumn align="start">Product</TableColumn>
+          <TableColumn align="start">Price</TableColumn>
+          <TableColumn align="start">Quantity</TableColumn>
+          <TableColumn align="start">Remove</TableColumn>
+        </TableHeader>
+        <TableBody>
+          {items.length === 0 ? (
+           
+           <TableRow >
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell>Your cart is empty.</TableCell>
+            <TableCell></TableCell>
+           </TableRow>
+           
+          ) : (
+            items.map((item, index) => (
+              <TableRow key={`${item.id}-${index}`}>
+                <TableCell>
+                  <User
+                  className=" my-user-img"
+                 data-loaded="true"
+                    avatarProps={{ radius: "lg", src: item.image,  } }
+                    // description={item.title}
+                    name={item.title}
+                  >
+                    {item.title}
+                  </User>
+                </TableCell>
 
-      <div className=" w-3/4 flex justify-center">
-      <section className=" w-full">
-      <div>
-      {cart.length === 0 ? (
-        <p>Your cart is empty!</p>
-      ) : (
-        cart.map((item) => (
-          <div key={item.id} style={{ display: "flex", alignItems: "center", padding: "16px", backgroundColor: "#f9f9f9", marginBottom: "8px", borderRadius: "8px" }}>
-            <img src={item.image} alt={item.title} style={{ width: "64px", height: "64px", borderRadius: "8px", marginRight: "16px" }} />
-            <div style={{ flex: 1 }}>
-              <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "4px" }}>{item.title}</h3>
-              <p style={{ fontSize: "14px" }}>Size: <strong>{item.size || "not select"}</strong> Color: <strong>{item.color|| "not select"}</strong></p>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ color: "red", fontSize: "18px" }}>-</button>
-              <span>{item.quantity}</span>
-              <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ color: "green", fontSize: "18px" }}>+</button>
-            </div>
-            <div style={{ marginLeft: "16px", fontWeight: "bold" }}>${item.price.toFixed(2)}</div>
-            <div style={{ marginLeft: "16px", fontWeight: "bold" }}>${(item.price * item.quantity).toFixed(2)} </div>
-            <button onClick={() => removeFromCart(item.id)} style={{ marginLeft: "16px", color: "red" }}>
-              <FaTrashCan style={{ width: "20px", height: "20px" }} />
-            </button>
-          </div>
-        ))
-        
-      )}
-      </div>
-      <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
-        <Input fullWidth placeholder="discount code/gift card" />
-        <Button color="primary">Apply</Button>
-      </div>
+                <TableCell>
+                  <div className="flex ">
+                    <p className="text-bold text-sm capitalize">{item.price}</p>
+                  </div>
+                </TableCell>
 
-      <Button fullWidth color="warning" style={{ marginTop: "16px" }}>Proceed to Pay</Button>
-     
-      <div className="cart-summary">
-        <p>Total Price: $
-          {cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
-        </p>
-      </div>
-    </section>
-      </div>
-    </section>
+                <TableCell className="flex self-center m-3 gap-3">
+                
+                  <Chip
+                   onClick={() => minusQuantity(item.id)}
+                    className="capitalize"
+                    color="success"
+                    size="sm"
+                    variant="flat"
+                  >
+                     <Tooltip color="success" content="Minus" >
+                                  <button
+                     
+                      className=""
+                    >
+                      -
+                    </button>
+                    </Tooltip>
+                  </Chip>
+                  <p>{item.quantity}</p>
+                  <Chip
+                   onClick={() => plusQuantity(item.id)}
+                    className="capitalize"
+                    color="success"
+                    size="sm"
+                    variant="flat"
+                  >
+                    <Tooltip color="success" content="Add" >
+                    <button
+                     
+                      className=""
+                    >
+                      +
+                    </button>
+                    </Tooltip>
+                  </Chip>
+                </TableCell>
+
+                <TableCell >
+                  <div className="relative flex items-center  gap-2">
+                    <Tooltip color="danger" content="Delete" >
+                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                        <DeleteIcon onClick={() => handleRemoveFromCart(item.id)} />
+                      </span>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </>
-
   );
 }

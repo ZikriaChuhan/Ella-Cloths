@@ -1,4 +1,7 @@
-'use client'
+"use client";
+
+import { useState, useEffect } from "react";
+import { useSelector  } from "react-redux";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "../image/ella-logo.png";
@@ -12,38 +15,47 @@ import WishlishHeart from "../image/wishlishHeart.png";
 import { FaSearch, FaUser } from "react-icons/fa";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { IoMdCloseCircle } from "react-icons/io";
-import { useState, useEffect } from "react";
+import { Modal, ModalContent, ModalBody, Button, useDisclosure, } from "@nextui-org/react";
+import { Tabs, Tab, Input, Card, CardBody } from "@nextui-org/react";
+import Marquee from "react-fast-marquee";
 
-export default function Header() {
-  const [cartNum, setCartNum] = useState(0);
-
-  useEffect(() => {
-    const calculateTotalQuantity = () => {
-      const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const totalQuantity = storedCart.reduce((total, item) => total + item.quantity, 0);
-      setCartNum(totalQuantity);
-    };
-    calculateTotalQuantity();
-    window.addEventListener("storage", calculateTotalQuantity);
-    return () => window.removeEventListener("storage", calculateTotalQuantity);
-  }, []);
-
- 
-
+export default function Header({ searchText, setSearchText }) {
   
+
+  const [selected, setSelected] = useState("login");
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const items = useSelector((state) => state.cart.items);
+  const itemsTotalQuantity = items.reduce((total, item) => total + item.quantity, 0);
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
+
+
+  const handlechangeSigin = () => {
+    onOpen();
+    setSelected("sign-up");
+  };
+  const handlechangeSigup = () => {
+    onOpen();
+    setSelected("login");
+  };
+
   return (
     <>
       <header className="flex flex-col gap-3 max-lg:gap-0">
-        <marquee className="marquee" behavior="loop" direction="left">
-          <div className="flex gap-32">
+        <Marquee className="marquee" autoFill={true} pauseOnClick={true}>
+          <div className="flex mx-10 gap-32">
             <p className="flex gap-2">
               <Image alt="img" src={ElectricIcon} className="ElectricIcon" />
               Summer sale: Up to 70% off selected items
             </p>
           </div>
-        </marquee>
+        </Marquee>
 
-     {/* Main Logo plus side detail */}
+        {/* Main Logo plus side detail */}
         <div className="flex justify-center flex-wrap max-lg:gap-3  items-end max-lg:hidden">
           <div className="w-1/2">
             <Image alt="img" src={Logo} className="Logomain" />
@@ -68,6 +80,7 @@ export default function Header() {
                   </span>
                 </div>
               </div>
+
               <div className="dropdown">
                 <span className="flex justify-center items-center gap-2">
                   <Image alt="img" src={USAIcon} className="Usa-icon" />
@@ -92,11 +105,13 @@ export default function Header() {
               <div>
                 <div className="search-box">
                   <button className="btn-search">
-                  <FaSearch className="fasearch" />
+                    <FaSearch className="fasearch" />
                   </button>
                   <input
                     type="text"
                     className="input-search"
+                    value={searchText}
+                    onChange={handleSearchChange}
                     placeholder="Type to Search..."
                   />
                 </div>
@@ -110,33 +125,45 @@ export default function Header() {
           </div> --> */}
 
             <div className="flex justify-end gap-3">
-                <Link href="/cart" >
+              <Link href="/cart">
               <div className="soping-card flex justify-center items-center gap-2 cursor-pointer">
                 <Image src={Basket} alt="basket" className="basket" />
                 <p>Shopping cart</p>
-                <span>{cartNum}</span>
+                <span>{itemsTotalQuantity}</span>
               </div>
-                </Link>
+              </Link>
 
               <div className="flex justify-center items-center gap-2 cursor-pointer">
-                <Image src={WishlishHeart} className="wishlishHeart" alt="basket" />
+                <Image
+                  src={WishlishHeart}
+                  className="wishlishHeart"
+                  alt="basket"
+                />
                 <p>My wish list</p>
               </div>
 
               <div className="signORcreat flex justify-center items-center gap-2">
-                <p className="cursor-pointer">Sign in</p>
+                <button
+                  onClick={handlechangeSigup}
+                  className=" text-sm cursor-pointer"
+                >
+                  Sign in
+                </button>
                 <span>/</span>
-                <p className="cursor-pointer">Create an account</p>
+                <button
+                  onClick={handlechangeSigin}
+                  className=" text-sm cursor-pointer"
+                >
+                  Create an account
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-
-   {/* Main menu */}
+        {/* Main menu */}
         <nav>
-
-            {/* Web Main menu */}
+          {/* Web Main menu */}
           <div className="flex justify-center gap-5 max-lg:hidden bg-black text-white">
             <div className="nav-links">
               <ul className="flex flex-wrap gap-8">
@@ -224,8 +251,11 @@ export default function Header() {
               </label>
               <FaSearch className="fasearch" />
               <ul className="moblieNav-ul lg:hidden flex flex-col pl-5 pt-5 justify-center flex-wrap gap-8">
-                <label htmlFor="checkmobile" className=" absolute right-5 top-5">
-                <IoMdCloseCircle className="close-icon" />
+                <label
+                  htmlFor="checkmobile"
+                  className=" absolute right-5 top-5"
+                >
+                  <IoMdCloseCircle className="close-icon" />
                 </label>
                 <li>
                   <Link href="/">Home</Link>
@@ -306,7 +336,7 @@ export default function Header() {
             </div>
 
             <div className="items-center flex gap-5">
-            <FaUser />
+              <FaUser />
               <Image src={Basket} alt="basket" className="basket" />
             </div>
           </div>
@@ -314,6 +344,113 @@ export default function Header() {
 
           {/* mobile-navigation end  */}
         </nav>
+        <Modal
+          backdrop="blur"
+          className=" bg-transparent shadow-none"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                {/* <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader> */}
+                <ModalBody>
+                  <div className="flex  flex-col justify-center items-center w-full">
+                    <Card className="  max-w-full w-[340px] ">
+                      <CardBody className="bg-transparent overflow-hidden">
+                        <Tabs
+                          fullWidth
+                          size="md"
+                          aria-label="Tabs form"
+                          selectedKey={selected}
+                          onSelectionChange={setSelected}
+                          className=" bg-transparent "
+                        >
+                          <Tab
+                            key="login"
+                            title="Login"
+                            className=" bg-transparent mb-7"
+                          >
+                            <form className="flex bg-transparent flex-col gap-4">
+                              <Input
+                                isRequired
+                                placeholder="Enter your email"
+                                type="email"
+                              />
+                              <Input
+                                isRequired
+                                className=" bg-transparent"
+                                placeholder="Enter your password"
+                                type="password"
+                              />
+                              <p className="text-center text-small">
+                                Need to create an account?{" "}
+                                <Link
+                                  size="sm"
+                                  href="/"
+                                  onClick={() => setSelected("sign-up")}
+                                >
+                                  Sign up
+                                </Link>
+                              </p>
+                              <div className="flex gap-2 justify-end">
+                                <Button fullWidth color="primary">
+                                  Login
+                                </Button>
+                              </div>
+                            </form>
+                          </Tab>
+                          <Tab key="sign-up" title="Sign up" className=" mb-7">
+                            <form className="flex flex-col gap-4 ">
+                              <Input
+                                isRequired
+                                placeholder="Enter your name"
+                                type="password"
+                              />
+                              <Input
+                                isRequired
+                                placeholder="Enter your email"
+                                type="email"
+                              />
+                              <Input
+                                isRequired
+                                placeholder="Enter your password"
+                                type="password"
+                              />
+                              <p className="text-center text-small">
+                                Already have an account?{" "}
+                                <Link
+                                  size="sm"
+                                  href="/"
+                                  onClick={() => setSelected("login")}
+                                >
+                                  Login
+                                </Link>
+                              </p>
+                              <div className="flex gap-2 justify-end">
+                                <Button fullWidth color="primary">
+                                  Sign up
+                                </Button>
+                              </div>
+                            </form>
+                          </Tab>
+                        </Tabs>
+                      </CardBody>
+                    </Card>
+                  </div>
+                </ModalBody>
+                {/* <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Action
+                </Button>
+              </ModalFooter> */}
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </header>
     </>
   );

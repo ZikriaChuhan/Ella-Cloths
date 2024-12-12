@@ -1,3 +1,4 @@
+
 import BannerTwo from "./component/bannertwo";
 import CarouselSection from "./component/carousel";
 import CategoriesBanner from "./component/categoriesbanner";
@@ -12,6 +13,8 @@ import TrendingNow from "./component/trendingnow";
 export default function Home() {
   return (
     <>
+
+
 
     <Header />
 
@@ -32,6 +35,7 @@ export default function Home() {
     <InstaSection />
 
     <Footer />
+
 
   
     </>
