@@ -6,7 +6,7 @@ import Image from "next/image";
 import Header from "../component/header";
 import { updateQuantity, removeFromCart } from "@/app/store/cartSlice";
 import Footer from "../component/footer";
-import CartTable from "../component/cartTable";
+import CartTable from "../component/carttable";
 
 export default function CartPage() {
   const items = useSelector((state) => state.cart.items);
